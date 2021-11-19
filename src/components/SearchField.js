@@ -6,7 +6,7 @@ const SearchFiled = (props) => {
 
     return (
         <>
-            <label for="ex2" className="mt-2 fs-5">Search your pokemon:</label>    
+            <label htmlFor="ex2" className="mt-2 fs-5">Search your pokemon:</label>    
             <input 
                 type="text"
                 value={value}
