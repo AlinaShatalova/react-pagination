@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react'
 import Pokemons from './components/Pokemons'
 import Pagination from './components/Pagination'
 import Buttons from './components/Buttons'
+import SearchFiled from './components/SearchField'
 import './App.css'
 
 function App() {
   const [pokemonData, setPokemonData] = useState([]);
+  const [userPokemon, setUserPokemon] = useState('');
   const [loading, setLoading] = useState(false); 
   const [currentPage, setCurrentPage] = useState(1);
   const [pokemonsPerPage] = useState(50);
@@ -14,7 +16,7 @@ function App() {
   useEffect(() => {
     const getPokemons = async () => {
       setLoading(true);
-      const res = await axios.get('https://pokeapi.co/api/v2/pokemon/?limit=100');
+      const res = await axios.get('https://pokeapi.co/api/v2/pokemon/?limit=400');
       await loadingPokemon(res.data.results);
       setLoading(false);
     }
@@ -31,11 +33,8 @@ function App() {
     setPokemonData(_pokemonData);
   }
 
-  const lastPokemonIndex = currentPage * pokemonsPerPage;
-  const firstPokemonIndex = lastPokemonIndex - pokemonsPerPage;
-  const currentPokemon = pokemonData.slice(firstPokemonIndex, lastPokemonIndex);
-
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   const nextPage = () => setCurrentPage((curr) => {
     if(curr === pokemonData.length / pokemonsPerPage) {
       return 1;
@@ -51,10 +50,21 @@ function App() {
     }
   });
 
+  const handleChangePokemon = (e) => {
+    setUserPokemon(e.target.value);
+  }
+
   return (
-    <div className="container mt-5">
-      <h1 className="text-primary">Pokemons</h1>
-      <Pokemons pokemonData={currentPokemon} loading={loading} />
+    <div className="container mt-5 shadow p-5 mb-5 bg-white rounded">
+      <h1 className="text-primary fs-1">Pokemons</h1>
+      <SearchFiled changeText={handleChangePokemon} value={userPokemon} />
+      <Pokemons
+        pokemonData={pokemonData}
+        userPokemon={userPokemon}
+        loading={loading} 
+        currentPage={currentPage}
+        pokemonsPerPage={pokemonsPerPage}
+        />
       <Pagination pokemonsPerPage={pokemonsPerPage} totalPokemons={pokemonData.length} paginate={paginate} />
       <Buttons nextPage={nextPage} prevPage={prevPage} />
     </div>

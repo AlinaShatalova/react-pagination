@@ -1,43 +1,82 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const Pokemons = ({ pokemonData, loading }) => {
+const Pokemons = ({ pokemonData, userPokemon, loading, currentPage, pokemonsPerPage }) => {
+    const [sortDirection, setSortDirection] = useState(null);
+
     if(loading) {
         return (
-            <h2>Loading...</h2>
+            <h2 className="alert alert-secondary mt-4 mb-4" style={{ maxWidth: "50%"}}>Loading...</h2>
         )
     }
 
-    return (
-        // Отображение в виде списка
-        // <ul className="list-group mb-2">
-        //     {pokemonData.map((pokemon, i) => (
-        //         <li className="list-group-item" key={i}>
-        //             <img src={pokemon.sprites.front_default} alt={pokemon.name}  className="ml-2" style={{width: 75}}/>
-        //             {pokemon.name}
-        //         </li>
-        //     ))}
-        // </ul>
+    // Копируем массив покемонов в новую переменную с учетом пользовательского ввода
+    let sortedPokemons = [];
 
-        <table className="table table-bordered table-striped w-50">
-            <thead className="thead-dark">
-                <tr>
-                    <th scope="col" width="7%">Icon</th>
-                    <th scope="col">Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                {pokemonData.map((pokemon, i) => (
-                    <tr key={i}>
-                        <td className="text-center">
-                            <img src={pokemon.sprites.front_default} alt={pokemon.name}  className="ml-2" style={{width: 75}} />
-                        </td>
-                        <td className="align-middle">
-                            {pokemon.name}
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+    if (userPokemon) {
+        sortedPokemons = pokemonData.filter((pokemon) => pokemon.name.startsWith(userPokemon));
+    } else {
+        sortedPokemons = [...pokemonData];
+    }
+    
+    // функция сортировки
+    if (sortDirection !== null) {
+        sortedPokemons.sort((a, b) => {
+            if (a.name < b.name) {
+                return sortDirection === 'ascending' ?  -1 : 1;
+            }
+            if (a.name > b.name) {
+                return sortDirection === 'ascending' ?  1 : -1;
+            }
+            return 0;
+        }
+    )};
+
+    // по клику
+    const requestDirection = () => {
+        const direction = sortDirection === 'ascending' ? 'descending' : 'ascending';
+        setSortDirection(direction);
+    }
+
+
+    // Получение покемонов для данной страницы
+    const lastPokemonIndex = currentPage * pokemonsPerPage;
+    const firstPokemonIndex = lastPokemonIndex - pokemonsPerPage;
+    const currentPokemon = sortedPokemons.slice(firstPokemonIndex, lastPokemonIndex);
+
+    return (
+        <>
+            {currentPokemon.length > 0 ?
+                <>
+                    <p className="mt-4 fs-6">
+                        To sort the table data in ascending order, click on the field "Name".
+                        To sort the table data in descending order, click on the field again
+                    </p>
+                    <table className="table table-bordered table-striped">
+                        <thead className="thead-dark">
+                            <tr>
+                                <th scope="col" width="7%">Icon</th>
+                                <th scope="col" onClick={() => requestDirection()} style={{cursor: 'pointer'}}>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentPokemon.map((pokemon, i) => (
+                                <tr key={i}>
+                                    <td className="text-center">
+                                        <img src={pokemon.sprites.front_default} alt={pokemon.name} className="ml-2" style={{width: 75}} />
+                                    </td>
+                                    <td className="align-middle">
+                                        {pokemon.name}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                        </table> 
+                </> :
+                <div className="alert alert-primary mt-4 mb-4" role="alert" style={{ maxWidth: "50%"}}>
+                    There are no pokemons with this name
+                </div>
+            }
+        </>  
     )
 };
 export default Pokemons;
