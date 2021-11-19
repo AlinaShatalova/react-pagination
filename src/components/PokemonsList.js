@@ -1,9 +1,9 @@
 import axios from 'axios'
 import React, { useState, useEffect } from 'react'
-import Pokemons from './components/Pokemons'
-import Pagination from './components/Pagination'
-import Buttons from './components/Buttons'
-import SearchFiled from './components/SearchField'
+import Pokemons from './Pokemons'
+import Pagination from './Pagination'
+import Buttons from './Buttons'
+import SearchFiled from './SearchField'
 import queryString from "query-string"
 import { useNavigate, useLocation } from "react-router-dom"
 
